@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.R Design & Build — Accounting Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #171717;
+    --surface2: #1f1f1f;
+    --border: #2a2a2a;
+    --accent: #c8a96e;
+    --accent2: #e8c98e;
+    --text: #f0ede8;
+    --muted: #6b6860;
+    --tag-bg: #1e1a14;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 32px 80px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .company-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--tag-bg);
+    border: 1px solid rgba(200,169,110,0.25);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .company-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 8vw, 88px);
+    letter-spacing: 0.02em;
+    line-height: 0.92;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.15s ease forwards;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+  }
+
+  .divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Category filter */
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s ease forwards;
+  }
+
+  .cat-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .cat-btn:hover, .cat-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,169,110,0.06);
+  }
+
+  /* Tracker grid */
+  .tracker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .tracker-item {
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .tracker-link {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tracker-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.22s ease;
+  }
+
+  .tracker-link:hover {
+    background: var(--surface2);
+    border-color: rgba(200,169,110,0.3);
+    transform: translateX(4px);
+  }
+
+  .tracker-link:hover::before {
+    transform: scaleY(1);
+  }
+
+  .tracker-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .tracker-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .tracker-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tracker-emoji {
+    font-size: 16px;
+  }
+
+  .tracker-desc {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .tracker-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .tracker-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(200,169,110,0.08);
+    border: 1px solid rgba(200,169,110,0.2);
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .tracker-arrow {
+    color: var(--muted);
+    font-size: 13px;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .tracker-link:hover .tracker-arrow {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s ease forwards;
+  }
+
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-right {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hidden items for filter */
+  .tracker-item.hidden {
+    display: none;
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 40px 20px 60px; }
+    .tracker-link { grid-template-columns: 36px 1fr; gap: 14px; padding: 16px 18px; }
+    .tracker-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="company-tag">M.R Design &amp; Build</div>
+    <h1>Accounting<br><span>Hub</span></h1>
+    <p class="subtitle">All financial trackers and project documents — one place.</p>
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-label">13 Active Trackers</span>
+  </div>
+
+  <div class="categories">
+    <button class="cat-btn active" onclick="filterCat('all')">All</button>
+    <button class="cat-btn" onclick="filterCat('EXPENSES')">Expenses</button>
+    <button class="cat-btn" onclick="filterCat('RECEIVABLES')">Receivables</button>
+    <button class="cat-btn" onclick="filterCat('PAYABLES')">Payables</button>
+    <button class="cat-btn" onclick="filterCat('VENDORS')">Vendors</button>
+    <button class="cat-btn" onclick="filterCat('CHECKS')">Checks</button>
+    <button class="cat-btn" onclick="filterCat('PROJECT DOCS')">Project Docs</button>
+    <button class="cat-btn" onclick="filterCat('LEGAL/COMPLIANCE')">Legal</button>
+    <button class="cat-btn" onclick="filterCat('BUDGET')">Budget</button>
+    <button class="cat-btn" onclick="filterCat('CASH FLOW')">Cash Flow</button>
+  </div>
+
+  <div class="tracker-list" id="trackerList">
+
+    <div class="tracker-item" data-cat="EXPENSES" style="animation-delay: 0.25s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1U1LW9K8-w2wkSeqZpf9OqqoQT_7M5EAs/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">01</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">🏢</span> Office Expenses</span>
+          <span class="tracker-desc">Track all office-related expenditures, utilities, supplies, and overhead costs.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Expenses</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="RECEIVABLES" style="animation-delay: 0.3s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/12pzPlpvnA3T4dmq-J_Tr7sIWNVhR-Soe/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">02</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">💵</span> Client Payments</span>
+          <span class="tracker-desc">Monitor incoming payments, balances due, and payment status per client.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Receivables</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="PAYABLES" style="animation-delay: 0.35s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1bKtHloA2a7kq-3K_91JBB1v0isI0EWcq/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">03</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">📋</span> AP Tracker</span>
+          <span class="tracker-desc">Manage all accounts payable, invoice due dates, and outstanding balances.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Payables</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="VENDORS" style="animation-delay: 0.4s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1d6HklSQ_QBIZeVS8E-yDg3XUsNE7wdYC/edit?usp=share_link&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">04</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">🏪</span> Vendor Payment Tracker</span>
+          <span class="tracker-desc">Track payments to vendors, subcontractors, and suppliers by project.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Vendors</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="CHECKS" style="animation-delay: 0.45s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1GnAX-LGRMLJ4zsFHy9ZtHFyJp54V__v9/edit?usp=share_link&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">05</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">✏️</span> Check Payments Tracker</span>
+          <span class="tracker-desc">Log all check disbursements, check numbers, payees, and clearing status.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Checks</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="PROJECT DOCS" style="animation-delay: 0.5s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1t7A8IRpZnKO7lkNfDxaymNvFEbr468D0/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">06</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">📝</span> Weekly RFI</span>
+          <span class="tracker-desc">Track requests for information submitted and received across all active projects.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Project Docs</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="LEGAL/COMPLIANCE" style="animation-delay: 0.55s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1AkhM5w48SWkhLH76hf7MVTiMQ4ziZ5IW/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">07</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">📄</span> Lien Release Tracker</span>
+          <span class="tracker-desc">Monitor conditional and unconditional lien releases across all active projects.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Legal/Compliance</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="CASH FLOW" style="animation-delay: 0.6s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1S50EPbvpJtFGzqxMItdktN35nFPpJ7hg/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">08</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">💰</span> Cash Flow Tracker</span>
+          <span class="tracker-desc">Weekly and monthly cash flow overview — inflows vs. outflows by project.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Cash Flow</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="BUDGET" style="animation-delay: 0.65s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1-z8hSohaMxzGUnn8ZKmLy5zm4Df-6ukp/edit?usp=sharing&ouid=103745689967940470739&rtpof=true&sd=true" target="_blank">
+        <span class="tracker-num">09</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">📊</span> Job Cost Tracker</span>
+          <span class="tracker-desc">Compare estimated vs. actual costs per project to keep jobs on budget.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Budget</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="SCHEDULE" style="animation-delay: 0.7s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1TCEk21UK5VZTi13xBTljvNw6HvEGFlwxxud-P8pD4Wg/edit?usp=sharing" target="_blank">
+        <span class="tracker-num">10</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">📅</span> Draw Schedule Tracker</span>
+          <span class="tracker-desc">Track construction loan draws, disbursement dates, and project milestones.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Schedule</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="COMPLIANCE" style="animation-delay: 0.75s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1WJmlMOQc6ImLSTqzY7NXhL5Vt_UvFoz-gD1RZMqk2n0/edit?usp=sharing" target="_blank">
+        <span class="tracker-num">11</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">🔖</span> W-9 / Subcontractor Log</span>
+          <span class="tracker-desc">Keep W-9 records and 1099 thresholds for all subs for year-end filing.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Compliance</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="RETAINAGE" style="animation-delay: 0.8s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1o9xgArjCQBRfkbHeq5OqPA2k1CE0uoa2BOHRsMVYMmk/edit?usp=sharing" target="_blank">
+        <span class="tracker-num">12</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">⚠️</span> Retainage Tracker</span>
+          <span class="tracker-desc">Monitor withheld retainage amounts per contract and scheduled release dates.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Retainage</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tracker-item" data-cat="PAYROLL" style="animation-delay: 0.85s">
+      <a class="tracker-link" href="https://docs.google.com/spreadsheets/d/1XDpCu-HaIdIwxkV7OZILDGsh80-KLEjwqERS5qnWYeI/edit?usp=sharing" target="_blank">
+        <span class="tracker-num">13</span>
+        <div class="tracker-info">
+          <span class="tracker-name"><span class="tracker-emoji">💼</span> Payroll</span>
+          <span class="tracker-desc">Employee payroll records and disbursement tracking.</span>
+        </div>
+        <div class="tracker-meta">
+          <span class="tracker-category">Payroll</span>
+          <span class="tracker-arrow">→</span>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span class="footer-left">MR-ACCOUNTING · 2025</span>
+    <span class="footer-right">Click any tracker to open in Google Sheets</span>
+  </div>
+
+</div>
+
+<script>
+  function filterCat(cat) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    document.querySelectorAll('.tracker-item').forEach(item => {
+      if (cat === 'all' || item.dataset.cat === cat) {
+        item.classList.remove('hidden');
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+  }
+</script>
+</body>
+</html>
